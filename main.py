@@ -4,7 +4,7 @@ import string
 import sys
 import os
 from flask import Flask, redirect, render_template, request
-import socket
+
 
 app = Flask(__name__)
 
@@ -44,14 +44,7 @@ def generate_random_url():
         generate_random_url()
 
 
-def insert_url(*args):
-    longURL = args[0]
-    if len(args) == 2:
-        shortURL = args[1]
-    else:
-        shortURL = generate_random_url()
-
-
+def insert_url(longURL, shortURL):
     cur.execute('insert into urls values ("{}", "{}")'.format(longURL, shortURL))
     con.commit()
     get_redirects()
@@ -71,7 +64,8 @@ def start():
         original_url = request.form.get('longUrl')
         short_url = request.form.get('shortUrl')  
         if short_url is '':
-            insert_url(original_url)
+            short_url = generate_random_url()
+            insert_url(original_url, short_url)
         else:
             insert_url(original_url, short_url)   
         return render_template('successful.html', original_url=original_url, short_url=short_url)
